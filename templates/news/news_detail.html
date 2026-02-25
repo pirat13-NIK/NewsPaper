@@ -1,0 +1,31 @@
+{% extends 'default.html' %}
+{% load custom_filters %}
+
+{% block title %}{{ news_item.title|censor }}{% endblock %}
+
+{% block content %}
+    <h2>{{ news_item.title|censor }}</h2>
+
+    <p><strong>Дата публикации:</strong> {{ news_item.created_at|date:"d.m.Y" }}</p>
+    <p><strong>Автор:</strong> {{ news_item.author.user.username }}</p>
+
+    <div style="margin-top: 20px; margin-bottom: 20px;">
+        <h3>Содержание:</h3>
+        <p>{{ news_item.text|censor|linebreaks }}</p>
+    </div>
+
+    {% if news_item.comment_set.all %}
+    <h3>Комментарии:</h3>
+    {% for comment in news_item.comment_set.all %}
+        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+            <p><strong>{{ comment.user.username }}</strong> ({{ comment.created_at|date:"d.m.Y H:i" }})</p>
+            <p>{{ comment.text|censor }}</p>
+            <p>Рейтинг: {{ comment.rating }}</p>
+        </div>
+    {% endfor %}
+    {% endif %}
+
+    <p><a href="{% url 'news_list' %}">← Назад к списку новостей</a></p>
+{% endblock %}
+    <p><a href="{% url 'news_list' %}">← Назад к списку новостей</a></p>
+{% endblock %}
