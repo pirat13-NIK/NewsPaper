@@ -1,11 +1,20 @@
 {% extends 'default.html' %}
+{% load custom_filters %}
 
 {% block title %}Все новости{% endblock %}
 
 {% block content %}
+{% if user.is_authenticated %}
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'news_create' %}">➕ Создать новость</a>
+        <a href="{% url 'article_create' %}" style="margin-left: 10px;">📝 Создать статью</a>
+    </div>
+{% endif %}
     <h2>Все новости</h2>
 
-    <p>Всего новостей: <strong>{{ news|length }}</strong></p>
+    <p>Всего новостей: <strong>{{ page_obj.paginator.count }}</strong></p>
+
+    <p><a href="{% url 'news_search' %}"> Поиск новостей</a></p>
 
     <table border="1" cellpadding="10" cellspacing="0">
         <thead>
@@ -16,13 +25,15 @@
             </tr>
         </thead>
         <tbody>
-            {% for item in news %}
+            {% for item in page_obj %}
             <tr>
                 <td>
-                    <a href="{% url 'news_detail' item.id %}">{{ item.title }}</a>
+                    <a href="{% url 'news_detail' item.id %}">
+                        {{ item.title|censor }}
+                    </a>
                 </td>
                 <td>{{ item.created_at|date:"d.m.Y" }}</td>
-                <td>{{ item.text|truncatewords:20 }}</td>
+                <td>{{ item.text|censor|truncatewords:20 }}</td>
             </tr>
             {% empty %}
             <tr>
@@ -31,4 +42,32 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <div class="pagination" style="margin-top: 20px;">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; Первая</a>
+                <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+            {% endif %}
+
+            <span class="current">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+    <div style="margin-top: 10px;">
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <strong>{{ num }}</strong>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
 {% endblock %}
