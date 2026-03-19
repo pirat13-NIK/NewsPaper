@@ -1,0 +1,49 @@
+{% extends 'default.html' %}
+
+{% block title %}Редактирование профиля{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 0 auto;">
+    <h2>Редактирование профиля</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div style="color: red; margin-bottom: 10px;">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        <div style="margin-bottom: 15px;">
+            <label for="id_first_name">Имя:</label><br>
+            <input type="text" name="first_name" id="id_first_name" 
+                   value="{{ form.first_name.value|default:'' }}"
+                   style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label for="id_last_name">Фамилия:</label><br>
+            <input type="text" name="last_name" id="id_last_name" 
+                   value="{{ form.last_name.value|default:'' }}"
+                   style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label for="id_email">Email:</label><br>
+            <input type="email" name="email" id="id_email" 
+                   value="{{ form.email.value|default:'' }}" required
+                   style="width: 100%; padding: 8px; margin-top: 5px;">
+            {% if form.email.errors %}
+                <div style="color: red;">{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="button" style="width: 100%;">Сохранить изменения</button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{% url 'profile' %}">Вернуться к профилю</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django import template
 import re
-
+from django import template
+import re
 register = template.Library()
 
 CENSORED_WORDS = ['редиска', 'нехорошее слово', 'плохое слово', 'ругательство']

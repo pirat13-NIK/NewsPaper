@@ -1,0 +1,58 @@
+{% extends 'default.html' %}
+{% load custom_filters %}
+
+{% block title %}Поиск новостей{% endblock %}
+
+{% block content %}
+    <h2>Поиск новостей</h2>
+    
+    <form method="get" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;">
+        <h3>Фильтры поиска:</h3>
+        {{ filter.form.as_p }}
+        <button type="submit" style="padding: 8px 15px; background-color: #0066cc; color: white; border: none; cursor: pointer;">Найти</button>
+    </form>
+    
+    <p>Найдено новостей: <strong>{{ page_obj.paginator.count }}</strong></p>
+    
+    {% if page_obj %}
+        <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; margin-top: 20px;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>Заголовок</th>
+                    <th>Автор</th>
+                    <th>Дата</th>
+                    <th>Первые 20 слов</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in page_obj %}
+                <tr>
+                    <td><a href="{% url 'news_detail' item.id %}">{{ item.title|censor }}</a></td>
+                    <td>{{ item.author.user.username }}</td>
+                    <td>{{ item.created_at|date:"d.m.Y" }}</td>
+                    <td>{{ item.text|censor|truncatewords:20 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Пагинация -->
+        <div style="margin-top: 20px;">
+            {% if page_obj.has_previous %}
+                <a href="?{% if filter.data %}{{ filter.data.urlencode }}&{% endif %}page=1">Первая</a>
+                <a href="?{% if filter.data %}{{ filter.data.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">Предыдущая</a>
+            {% endif %}
+            
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+            
+            {% if page_obj.has_next %}
+                <a href="?{% if filter.data %}{{ filter.data.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Следующая</a>
+                <a href="?{% if filter.data %}{{ filter.data.urlencode }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Последняя</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <p>Новостей не найдено. Попробуйте изменить параметры поиска.</p>
+    {% endif %}
+    
+    <p style="margin-top: 20px;"><a href="{% url 'news_list' %}">← Назад к списку новостей</a></p>
+{% endblock %}

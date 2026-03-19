@@ -1,43 +1,44 @@
 {% extends 'default.html' %}
-{% load custom_filters %}
 
-{% block title %}Все новости{% endblock %}
+{% block title %}Новости{% endblock %}
 
 {% block content %}
-{% if user.is_authenticated %}
-    <div style="margin-bottom: 20px;">
-        <a href="{% url 'news_create' %}">➕ Создать новость</a>
-        <a href="{% url 'article_create' %}" style="margin-left: 10px;">📝 Создать статью</a>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>Новости</h2>
+
+    {% if user.is_authenticated and user.groups.filter.name == 'authors' %}
+    <div>
+        <a href="{% url 'news_create' %}" class="button button-success">Создать новость</a>
+        <a href="{% url 'article_create' %}" class="button button-success">Создать статью</a>
     </div>
-{% endif %}
-    <h2>Все новости</h2>
+    {% endif %}
+</div>
 
-    <p>Всего новостей: <strong>{{ page_obj.paginator.count }}</strong></p>
-
-    <p><a href="{% url 'news_search' %}"> Поиск новостей</a></p>
-
-    <table border="1" cellpadding="10" cellspacing="0">
+{% if page_obj %}
+    <table>
         <thead>
             <tr>
                 <th>Заголовок</th>
                 <th>Дата публикации</th>
-                <th>Первые 20 слов</th>
+                <th>Автор</th>
+                <th>Рейтинг</th>
+                <th>Действия</th>
             </tr>
         </thead>
         <tbody>
-            {% for item in page_obj %}
+            {% for news in page_obj %}
             <tr>
+                <td><a href="{% url 'news_detail' news.id %}">{{ news.title|censor }}</a></td>
+                <td>{{ news.created_at|date:"d.m.Y" }}</td>
+                <td>{{ news.author.user.username }}</td>
+                <td>{{ news.rating }}</td>
                 <td>
-                    <a href="{% url 'news_detail' item.id %}">
-                        {{ item.title|censor }}
-                    </a>
+                    <a href="{% url 'news_detail' news.id %}" class="button">Просмотр</a>
+                    {% if user.is_authenticated and user.groups.filter.name == 'authors' and user == news.author.user %}
+                        <a href="{% url 'news_edit' news.id %}" class="button">Редактировать</a>
+                        <a href="{% url 'news_delete' news.id %}" class="button button-danger">Удалить</a>
+                    {% endif %}
                 </td>
-                <td>{{ item.created_at|date:"d.m.Y" }}</td>
-                <td>{{ item.text|censor|truncatewords:20 }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3">Новостей пока нет</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -60,14 +61,7 @@
             {% endif %}
         </span>
     </div>
-
-    <div style="margin-top: 10px;">
-        {% for num in page_obj.paginator.page_range %}
-            {% if page_obj.number == num %}
-                <strong>{{ num }}</strong>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <a href="?page={{ num }}">{{ num }}</a>
-            {% endif %}
-        {% endfor %}
-    </div>
+{% else %}
+    <p>Новостей пока нет.</p>
+{% endif %}
 {% endblock %}

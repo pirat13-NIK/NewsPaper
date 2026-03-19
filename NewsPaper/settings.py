@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
 from pathlib import Path
+import os
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
     'news',
     'accounts',
     'django_filters',
@@ -50,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'NewsPaper.urls'
@@ -120,3 +127,43 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+SITE_ID = 1
+
+# Адрес для перенаправления на страницу входа
+LOGIN_URL = '/accounts/login/'
+# Адрес перенаправления после успешного входа
+LOGIN_REDIRECT_URL = '/news/'
+LOGOUT_REDIRECT_URL = '/'
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'  # Изменили на optional для Yandex
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Yandex OAuth2 settings (для локальной разработки)
+# В production нужно зарегистрировать приложение в Yandex и получить Client ID и Secret
+SOCIALACCOUNT_PROVIDERS = {
+    'yandex': {
+        'APP': {
+            'client_id': '123',  # Замените на реальные данные
+            'secret': '456',      # Замените на реальные данные
+            'key': ''
+        },
+        'OAUTH2_AUTH_URI': 'https://oauth.yandex.ru/authorize',
+        'OAUTH2_TOKEN_URI': 'https://oauth.yandex.ru/token',
+        'OAUTH2_USERINFO_URI': 'https://login.yandex.ru/info',
+        'USER_FIELDS': ['id', 'login', 'first_name', 'last_name', 'email', 'default_email'],
+        'METHOD': 'oauth2',
+        'SCOPE': ['login:email', 'login:info'],
+    }
+}

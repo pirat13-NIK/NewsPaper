@@ -1,0 +1,58 @@
+{% extends 'default.html' %}
+
+{% block title %}Вход в систему{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 0 auto;">
+    <h2>Вход в систему</h2>
+    
+    <form method="post" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div style="color: red; margin-bottom: 10px;">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        <div style="margin-bottom: 15px;">
+            <label for="id_login">Email:</label><br>
+            <input type="email" name="login" id="id_login" required 
+                   style="width: 100%; padding: 8px; margin-top: 5px;">
+            {% if form.login.errors %}
+                <div style="color: red;">{{ form.login.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label for="id_password">Пароль:</label><br>
+            <input type="password" name="password" id="id_password" required 
+                   style="width: 100%; padding: 8px; margin-top: 5px;">
+            {% if form.password.errors %}
+                <div style="color: red;">{{ form.password.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>
+                <input type="checkbox" name="remember"> Запомнить меня
+            </label>
+        </div>
+        
+        <button type="submit" class="button" style="width: 100%;">Войти</button>
+    </form>
+    
+    <hr style="margin: 20px 0;">
+    
+    <div style="text-align: center;">
+        <p>Или войдите через:</p>
+        <a href="{% url 'yandex_login' %}" class="button" style="background-color: #fc0; color: #000;">
+            Yandex
+        </a>
+    </div>
+    
+    <div style="text-align: center; margin-top: 20px;">
+        <p>Нет аккаунта? <a href="{% url 'account_signup' %}">Зарегистрироваться</a></p>
+    </div>
+</div>
+{% endblock %}

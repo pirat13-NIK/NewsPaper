@@ -1,0 +1,17 @@
+{% extends 'default.html' %}
+
+{% block title %}Выход{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 0 auto; text-align: center;">
+    <h2>Выход из системы</h2>
+    
+    <p>Вы уверены, что хотите выйти?</p>
+    
+    <form method="post" action="{% url 'account_logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="button button-danger">Выйти</button>
+        <a href="{% url 'news_list' %}" class="button">Отмена</a>
+    </form>
+</div>
+{% endblock %}
