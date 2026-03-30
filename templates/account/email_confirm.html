@@ -1,0 +1,27 @@
+{% extends 'default.html' %}
+{% load i18n %}
+{% load account %}
+
+{% block title %}Подтверждение email{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; text-align: center;">
+    <h2>Подтверждение email адреса</h2>
+    
+    {% if confirmation %}
+        <div style="background-color: #e3f2fd; padding: 20px; border-radius: 5px; margin: 20px 0;">
+            <p>Пожалуйста, подтвердите, что <strong>{{ confirmation.email_address.email }}</strong> является вашим email адресом.</p>
+        </div>
+        
+        <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+            {% csrf_token %}
+            <button type="submit" class="button button-success">Подтвердить</button>
+        </form>
+    {% else %}
+        <div style="background-color: #fff3cd; padding: 20px; border-radius: 5px; margin: 20px 0;">
+            <p>Ссылка для подтверждения устарела или недействительна.</p>
+            <p>Пожалуйста, <a href="{% url 'account_email' %}">запросите новое письмо с подтверждением</a>.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

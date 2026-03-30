@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Еженедельная рассылка - Новостной портал</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .header p {
+            margin: 10px 0 0;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .category-title {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .category-title h2 {
+            margin: 0;
+            color: #667eea;
+        }
+        .stats {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .post-list {
+            margin: 20px 0;
+        }
+        .post-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .post-item:last-child {
+            border-bottom: none;
+        }
+        .post-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .post-title a {
+            color: #333;
+            text-decoration: none;
+        }
+        .post-title a:hover {
+            color: #667eea;
+        }
+        .post-meta {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        .post-preview {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .read-more {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        .read-more:hover {
+            text-decoration: underline;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            border-top: 1px solid #eee;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+            }
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Новостной портал</h1>
+            <p>Ваша еженедельная подборка новостей</p>
+        </div>
+
+        <div class="content">
+            <div class="greeting">
+                Здравствуйте, {{ username }}!
+            </div>
+
+            <div class="category-title">
+                <h2>Категория: {{ category.name }}</h2>
+            </div>
+
+            <div class="stats">
+                За период с {{ week_start|date:"d.m.Y" }} по {{ week_end|date:"d.m.Y" }}
+                <br>
+                <strong>{{ posts|length }}</strong> новых {{ posts|length|pluralize:"статья,статьи,статей" }}
+            </div>
+
+            <div class="post-list">
+                {% for post in posts %}
+                <div class="post-item">
+                    <div class="post-title">
+                        <a href="{{ site_url }}{% url 'news_detail' post.id %}">
+                            {{ post.title }}
+                        </a>
+                    </div>
+                    <div class="post-meta">
+                        Дата: {{ post.created_at|date:"d.m.Y H:i" }} |
+                        Автор: {{ post.author.user.username }} |
+                        Рейтинг: {{ post.rating }}
+                    </div>
+                    <div class="post-preview">
+                        {{ post.preview_50 }}...
+                    </div>
+                    <a href="{{ site_url }}{% url 'news_detail' post.id %}" class="read-more">
+                        Читать полностью →
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div style="text-align: center;">
+                <a href="{{ site_url }}{% url 'category_list' %}" class="button">
+                    Все категории
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© {% now "Y" %} Новостной портал. Все права защищены.</p>
+            <p>Вы получили это письмо, так как подписаны на рассылку категории "{{ category.name }}".</p>
+            <p>Чтобы отписаться, перейдите в <a href="{{ site_url }}{% url 'category_list' %}">раздел категорий</a> на нашем сайте.</p>
+        </div>
+    </div>
+</body>
+</html>

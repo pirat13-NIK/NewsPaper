@@ -1,0 +1,54 @@
+{% extends 'default.html' %}
+{% load custom_filters %}
+
+{% block title %}Профиль пользователя{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <h2>Профиль пользователя</h2>
+    
+    <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px;">
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Имя:</strong> {{ user.first_name|default:"не указано" }}</p>
+        <p><strong>Фамилия:</strong> {{ user.last_name|default:"не указано" }}</p>
+        <p><strong>Группы:</strong> 
+            {% for group in user.groups.all %}
+                <span class="badge {% if group.name == 'authors' %}badge-author{% endif %}">
+                    {{ group.name }}
+                </span>
+            {% empty %}
+                Нет групп
+            {% endfor %}
+        </p>
+        <p><strong>Статус автора:</strong> 
+            {% if user.groups.filter.name == 'authors' %}
+                <span style="color: green;">✓ Вы автор</span>
+            {% else %}
+                <span style="color: orange;">✗ Не автор</span>
+            {% endif %}
+        </p>
+        
+        {% if user.groups.filter.name == 'authors' %}
+            {% load news_utils %}
+            {% with remaining=user|get_remaining_posts %}
+            <div style="background-color: #e3f2fd; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                <strong>Статистика публикаций:</strong><br>
+                <p>Сегодня вы можете создать <strong>{{ remaining }}</strong> из 3 постов.</p>
+                {% if remaining == 0 %}
+                    <p style="color: red;">Вы исчерпали лимит публикаций на сегодня. Попробуйте завтра.</p>
+                {% elif remaining == 1 %}
+                    <p style="color: orange;">У вас осталась только одна публикация на сегодня.</p>
+                {% endif %}
+            </div>
+            {% endwith %}
+        {% endif %}
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <a href="{% url 'profile_edit' %}" class="button">Редактировать профиль</a>
+        {% if not user.groups.filter.name == 'authors' %}
+            <a href="{% url 'become_author' %}" class="button button-success">Стать автором</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

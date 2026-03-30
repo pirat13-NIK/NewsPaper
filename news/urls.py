@@ -14,4 +14,9 @@ urlpatterns = [
 
     path('news/<int:pk>/delete/', views.NewsDeleteView.as_view(), name='news_delete'),
     path('articles/<int:pk>/delete/', views.ArticleDeleteView.as_view(), name='article_delete'),
+
+    path('category/<int:category_id>/subscribe/', views.subscribe_to_category, name='subscribe_category'),
+    path('category/<int:category_id>/unsubscribe/', views.unsubscribe_from_category, name='unsubscribe_category'),
+
+    path('categories/', views.CategoryListView.as_view(), name='category_list'),
 ]

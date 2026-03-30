@@ -1,0 +1,127 @@
+{% load account %}
+{% load i18n %}
+
+{% user_display user as user_display %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Подтверждение регистрации - Новостной портал</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .greeting {
+            background: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-left: 4px solid #2196f3;
+            margin: 20px 0;
+        }
+        .link {
+            background: #f4f4f4;
+            padding: 10px;
+            word-break: break-all;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        .warning {
+            color: #ff9800;
+            font-size: 12px;
+            margin: 15px 0;
+        }
+        .footer {
+            background: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Новостной портал</h1>
+        </div>
+
+        <div class="content">
+            <div class="greeting">
+                <strong>Здравствуйте, {{ user_display }}!</strong>
+            </div>
+
+            <p>Вы успешно зарегистрировались на нашем портале.</p>
+
+            <div class="info">
+                <strong>После активации вам будут доступны:</strong><br>
+                • Чтение новостей и статей<br>
+                • Комментирование<br>
+                • Подписки на категории<br>
+                • Публикация своих материалов
+            </div>
+
+            <p>Для завершения регистрации подтвердите email:</p>
+
+            <div style="text-align: center;">
+                <a href="{{ activate_url }}" class="button">Активировать аккаунт</a>
+            </div>
+
+            <p>Или скопируйте ссылку:</p>
+            <div class="link">
+                {{ activate_url }}
+            </div>
+
+            <div class="warning">
+                Ссылка действительна 3 дня.
+            </div>
+
+            <p>Если вы не регистрировались, проигнорируйте это письмо.</p>
+        </div>
+
+        <div class="footer">
+            <p>© {% now "Y" %} Новостной портал</p>
+            <p>Это автоматическое сообщение</p>
+        </div>
+    </div>
+</body>
+</html>

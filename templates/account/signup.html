@@ -6,6 +6,10 @@
 <div style="max-width: 400px; margin: 0 auto;">
     <h2>Регистрация нового пользователя</h2>
     
+    <div style="background-color: #e3f2fd; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+        <small>После регистрации вам будет отправлено письмо для подтверждения email адреса.</small>
+    </div>
+
     <form method="post" action="{% url 'account_signup' %}">
         {% csrf_token %}
         

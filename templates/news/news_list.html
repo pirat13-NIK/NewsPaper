@@ -1,4 +1,5 @@
 {% extends 'default.html' %}
+{% load custom_filters %}
 
 {% block title %}Новости{% endblock %}
 
@@ -15,10 +16,11 @@
 </div>
 
 {% if page_obj %}
-    <table>
+     <table>
         <thead>
             <tr>
                 <th>Заголовок</th>
+                <th>Категории</th>
                 <th>Дата публикации</th>
                 <th>Автор</th>
                 <th>Рейтинг</th>
@@ -29,7 +31,28 @@
             {% for news in page_obj %}
             <tr>
                 <td><a href="{% url 'news_detail' news.id %}">{{ news.title|censor }}</a></td>
-                <td>{{ news.created_at|date:"d.m.Y" }}</td>
+                <td>
+                    {% for category in news.categories.all %}
+                        <span style="display: inline-block; margin: 2px;">
+                            {{ category.name }}
+                            {% if user.is_authenticated %}
+                                {% if user in category.subscribers.all %}
+                                    <a href="{% url 'unsubscribe_category' category.id %}"
+                                       style="color: #dc3545; text-decoration: none; font-size: 10px;"
+                                       title="Отписаться"></a>
+                                {% else %}
+                                    <a href="{% url 'subscribe_category' category.id %}"
+                                       style="color: #28a745; text-decoration: none; font-size: 10px;"
+                                       title="Подписаться"></a>
+                                {% endif %}
+                            {% endif %}
+                        </span>
+                        {% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        Без категории
+                    {% endfor %}
+                </td>
+                <td>{{ news.created_at|date:"d.m.Y H:i" }}</td>
                 <td>{{ news.author.user.username }}</td>
                 <td>{{ news.rating }}</td>
                 <td>

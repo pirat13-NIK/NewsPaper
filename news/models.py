@@ -5,6 +5,7 @@ from accounts.models import Author
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    subscribers = models.ManyToManyField(User, related_name='subscriptions', blank=True)
 
     def __str__(self):
         return self.name
@@ -38,6 +39,11 @@ class Post(models.Model):
         if len(self.text) <= 124:
             return self.text
         return self.text[:124] + '...'
+
+    def preview_50(self):
+        if len(self.text) <= 50:
+            return self.text
+        return self.text[:50] + '...'
 
     def __str__(self):
         return f"{self.get_post_type_display()}: {self.title} (рейтинг: {self.rating})"

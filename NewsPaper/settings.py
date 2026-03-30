@@ -133,9 +133,7 @@ LOGOUT_REDIRECT_URL = '/'
 
 SITE_ID = 1
 
-# Адрес для перенаправления на страницу входа
 LOGIN_URL = '/accounts/login/'
-# Адрес перенаправления после успешного входа
 LOGIN_REDIRECT_URL = '/news/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -143,12 +141,13 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'optional'  # Изменили на optional для Yandex
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
-]
+# Настройки email верификации
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/accounts/login/'
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/accounts/login/'
 
 # Yandex OAuth2 settings (для локальной разработки)
 # В production нужно зарегистрировать приложение в Yandex и получить Client ID и Secret
@@ -167,3 +166,24 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': ['login:email', 'login:info'],
     }
 }
+
+# Для разработки используем консольный бэкенд
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Для реальной отправки используйте SMTP:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.yandex.ru'  # или ваш SMTP сервер
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@yandex.ru'
+# EMAIL_HOST_PASSWORD = 'your-password'
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+DEFAULT_FROM_EMAIL = 'noreply@newspaper.com'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'

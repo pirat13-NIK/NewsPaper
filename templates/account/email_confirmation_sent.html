@@ -1,0 +1,27 @@
+{% extends 'default.html' %}
+{% load i18n %}
+{% load account %}
+
+{% block title %}Письмо отправлено{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; text-align: center;">
+    <h2>Письмо с подтверждением отправлено</h2>
+    
+    <div style="background-color: #d4edda; padding: 20px; border-radius: 5px; margin: 20px 0;">
+        <p>На указанный email адрес отправлено письмо с ссылкой для подтверждения регистрации.</p>
+        <p>Пожалуйста, перейдите по ссылке в письме для активации вашего аккаунта.</p>
+    </div>
+    
+    <div class="info-box" style="background-color: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <strong>Важно:</strong>
+        <ul style="text-align: left;">
+            <li>Проверьте папку "Спам", если письмо не пришло в основной почтовый ящик</li>
+            <li>Ссылка действительна в течение 3 дней</li>
+            <li>Если вы не получили письмо, вы можете <a href="{% url 'account_email' %}">запросить повторную отправку</a></li>
+        </ul>
+    </div>
+    
+    <a href="{% url 'account_login' %}" class="button">Вернуться на страницу входа</a>
+</div>
+{% endblock %}
