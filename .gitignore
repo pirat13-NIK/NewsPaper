@@ -32,3 +32,8 @@ local_settings.py
 
 # Logs
 *.log
+
+# Celery beat schedule files
+celerybeat-schedule
+celerybeat-schedule-shm
+celerybeat-schedule-wal

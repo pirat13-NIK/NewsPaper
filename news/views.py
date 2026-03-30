@@ -12,6 +12,7 @@ from django.conf import settings
 from .models import Post, Category
 from .filters import NewsFilter
 from .utils import check_daily_post_limit, get_remaining_posts_today
+from .tasks import send_notification_to_subscribers_async
 
 
 # Ваши функции
@@ -113,10 +114,10 @@ class NewsCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         if not check_daily_post_limit(request.user):
-            remaining = get_remaining_posts(request.user)
+            remaining = get_remaining_posts_today(request.user)
             messages.error(
                 request,
-                f'Вы превысили лимит публикаций! Вы можете создать не более 3 постов в сутки. '
+                f'Вы превысили лимит публикаций! Можно создавать не более 3 постов в сутки.\n'
                 f'Сегодня вы уже использовали все попытки. Попробуйте завтра.'
             )
             return redirect('news_list')
@@ -129,12 +130,12 @@ class NewsCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         post.save()
         form.save_m2m()
 
-        send_notification_to_subscribers(post)
+        send_notification_to_subscribers_async.delay(post.id)
 
-        remaining = get_remaining_posts(self.request.user)
+        remaining = get_remaining_posts_today(self.request.user)
         messages.success(
             self.request,
-            f'Новость успешно создана! Уведомления отправлены подписчикам. '
+            f'Новость успешно создана! Уведомления отправляются подписчикам.\n'
             f'Сегодня осталось публикаций: {remaining} из 3'
         )
         return super().form_valid(form)
@@ -148,12 +149,11 @@ class ArticleCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView)
     permission_required = 'news.add_post'
 
     def dispatch(self, request, *args, **kwargs):
-        """Проверяем лимит постов перед созданием"""
         if not check_daily_post_limit(request.user):
-            remaining = get_remaining_posts(request.user)
+            remaining = get_remaining_posts_today(request.user)
             messages.error(
                 request,
-                f'Вы превысили лимит публикаций! Вы можете создать не более 3 постов в сутки. '
+                f'Вы превысили лимит публикаций! Можно создавать не более 3 постов в сутки.\n'
                 f'Сегодня вы уже использовали все попытки. Попробуйте завтра.'
             )
             return redirect('news_list')
@@ -166,13 +166,12 @@ class ArticleCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView)
         post.save()
         form.save_m2m()
 
-        # Отправляем уведомления подписчикам
-        send_notification_to_subscribers(post)
+        send_notification_to_subscribers_async.delay(post.id)
 
-        remaining = get_remaining_posts(self.request.user)
+        remaining = get_remaining_posts_today(self.request.user)
         messages.success(
             self.request,
-            f'Статья успешно создана! Уведомления отправлены подписчикам. '
+            f'Статья успешно создана! Уведомления отправляются подписчикам.\n'
             f'Сегодня осталось публикаций: {remaining} из 3'
         )
         return super().form_valid(form)
