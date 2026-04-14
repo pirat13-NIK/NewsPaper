@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 
 
 class NewsFilter(django_filters.FilterSet):
+    """Фильтр для поиска новостей по названию, автору и дате."""
     title = django_filters.CharFilter(
         field_name='title',
         lookup_expr='icontains',

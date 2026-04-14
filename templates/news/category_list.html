@@ -1,17 +1,21 @@
 {% extends 'default.html' %}
+{% load cache %}
 
 {% block title %}Категории{% endblock %}
 
 {% block content %}
+{% cache 600 category_list_header %}
 <h2>Категории новостей</h2>
+{% endcache %}
 
+{% cache 600 category_list categories %}
 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
     {% for category in categories %}
-    <div style="border: 1px solid #ddd; border-radius: 5px; padding: 15px;">
+    <div style="border: 1px solid #ddd; border-radius: 5px; padding: 15px; background-color: #f9f9f9;">
         <h3>{{ category.name }}</h3>
         <p>Количество статей: {{ category.post_set.count }}</p>
         <p>Подписчиков: {{ category.subscribers.count }}</p>
-        
+
         {% if user.is_authenticated %}
             {% if user in category.subscribers.all %}
                 <a href="{% url 'unsubscribe_category' category.id %}" class="button button-danger">
@@ -26,6 +30,9 @@
             <p><a href="{% url 'account_login' %}">Войдите</a> чтобы подписаться</p>
         {% endif %}
     </div>
+    {% empty %}
+    <p>Категории пока не созданы.</p>
     {% endfor %}
 </div>
+{% endcache %}
 {% endblock %}

@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
 from pathlib import Path
-import os
-from pathlib import Path
 from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -66,7 +64,7 @@ ROOT_URLCONF = 'NewsPaper.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # добавьте эту строку
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -187,22 +185,52 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
+ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'  # Кастомный адаптер для персонализированных писем
 
 # Celery settings
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Брокер сообщений Redis
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Хранилище результатов
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
+# Celery Beat schedule - периодические задачи
 CELERY_BEAT_SCHEDULE = {
     'send-weekly-newsletter': {
         'task': 'news.tasks.send_weekly_newsletter',
-        'schedule': crontab(day_of_week='monday', hour=8, minute=0),
+        'schedule': crontab(day_of_week='monday', hour=8, minute=0),  # Каждый понедельник в 8:00
         'options': {
             'expires': 3600,
         }
     },
+}
+
+# Cache settings with better performance
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'PARSER_CLASS': 'redis.connection.HiredisParser',
+            'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
+            'CONNECTION_POOL_CLASS_KWARGS': {
+                'max_connections': 50,
+                'timeout': 20,
+            },
+            'MAX_CONNECTIONS': 1000,
+            'PICKLE_VERSION': -1,
+        },
+        'KEY_PREFIX': 'newspaper',
+        'TIMEOUT': 3600,
+    }
+}
+
+# Настройки времени кэширования для разных типов данных
+CACHE_TIMEOUTS = {
+    'post': 3600,      # 1 час для статей
+    'comment': 1800,   # 30 минут для комментариев
+    'list': 300,       # 5 минут для списков
+    'nav': 600,        # 10 минут для навигации
 }

@@ -1,9 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.shortcuts import redirect  # Добавьте этот импорт
+from django.shortcuts import redirect
 
 
 def home_redirect(request):
+    """Перенаправляет корневой URL на страницу со списком новостей."""
     return redirect('news_list')
 
 

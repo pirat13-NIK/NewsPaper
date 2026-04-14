@@ -7,6 +7,7 @@ register = template.Library()
 
 @register.filter(name='get_remaining_posts')
 def get_remaining_posts(user):
+    """Возвращает количество оставшихся публикаций на сегодня (макс. 3)."""
     if not user.is_authenticated:
         return 0
 

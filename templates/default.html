@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load cache %}
 <html>
 <head>
     <title>{% block title %}Новостной портал{% endblock %}</title>
@@ -63,13 +64,16 @@
     <header>
         <div>
             <h1>Новостной портал</h1>
+            {% cache 300 navigation %}
             <nav>
                 <a href="{% url 'news_list' %}">Главная</a>
                 <a href="{% url 'news_search' %}">Поиск</a>
                 <a href="{% url 'category_list' %}">Категории</a>
             </nav>
+            {% endcache %}
         </div>
 
+        {% cache 60 user_info user.is_authenticated user.id %}
         <div class="user-info">
             {% if user.is_authenticated %}
                 <span>
@@ -85,7 +89,7 @@
                     {% endif %}
                 </span>
 
-                {% if not user.groups.filter(name='authors').exists %}
+                {% if not user.groups.filter.name == 'authors' %}
                     <a href="{% url 'become_author' %}" class="button button-success">Стать автором</a>
                 {% endif %}
 
@@ -95,23 +99,28 @@
                 <a href="{% url 'account_signup' %}" class="button">Регистрация</a>
             {% endif %}
         </div>
+        {% endcache %}
     </header>
 
+    {% cache 60 messages messages %}
     {% if messages %}
     <ul class="messages">
         {% for message in messages %}
-            <li>{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
         {% endfor %}
     </ul>
     {% endif %}
+    {% endcache %}
 
     <main>
         {% block content %}
         {% endblock %}
     </main>
 
+    {% cache 600 footer %}
     <footer>
         <p>&copy; {% now "Y" %} Новостной портал</p>
     </footer>
+    {% endcache %}
 </body>
 </html>

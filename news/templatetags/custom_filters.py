@@ -1,7 +1,6 @@
 from django import template
 import re
-from django import template
-import re
+
 register = template.Library()
 
 CENSORED_WORDS = ['редиска', 'нехорошее слово', 'плохое слово', 'ругательство']
@@ -9,6 +8,7 @@ CENSORED_WORDS = ['редиска', 'нехорошее слово', 'плохо
 
 @register.filter(name='censor')
 def censor(value):
+    """Заменяет нецензурные слова звездочками."""
     if not isinstance(value, str):
         return value
 

@@ -9,9 +9,11 @@ from django.apps import apps
 
 
 class Command(BaseCommand):
+    """Отправляет еженедельную рассылку новых статей подписчикам категорий."""
     help = 'Отправляет еженедельную рассылку новых статей подписчикам'
 
     def handle(self, *args, **options):
+        """Запускает процесс отправки еженедельной рассылки."""
         self.stdout.write('Начинаю отправку еженедельной рассылки...')
 
         Category = apps.get_model('news', 'Category')

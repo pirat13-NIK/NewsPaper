@@ -1,0 +1,69 @@
+{% extends 'default.html' %}
+{% load cache %}
+{% load custom_filters %}
+
+{% block title %}{{ article_item.title|censor }}{% endblock %}
+
+{% block content %}
+{% cache 300 article_detail article_item.id article_item.updated_at %}
+<div class="article-detail">
+    <h1>{{ article_item.title|censor }}</h1>
+    
+    <div class="article-meta">
+        <p>
+            Дата: {{ article_item.created_at|date:"d.m.Y H:i" }} | 
+            Автор: {{ article_item.author.user.username }} | 
+            Рейтинг: {{ article_item.rating }}
+        </p>
+        <p>
+            Категории: 
+            {% for category in article_item.categories.all %}
+                {{ category.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+    </div>
+    
+    <div class="article-content">
+        {{ article_item.text|censor|linebreaks }}
+    </div>
+    
+    <div class="article-actions">
+        <a href="{% url 'news_list' %}" class="button">Назад к новостям</a>
+        
+        {% if user.is_authenticated and user == article_item.author.user %}
+            <a href="{% url 'article_edit' article_item.id %}" class="button">Редактировать</a>
+            <a href="{% url 'article_delete' article_item.id %}" class="button button-danger">Удалить</a>
+        {% endif %}
+        
+        <button onclick="window.print()" class="button">Печать</button>
+    </div>
+    
+    <hr>
+    
+    <h3>Комментарии ({{ comments|length }})</h3>
+    
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'add_comment' article_item.id %}">
+            {% csrf_token %}
+            <textarea name="text" rows="3" style="width: 100%; padding: 10px;" placeholder="Ваш комментарий..."></textarea>
+            <button type="submit" class="button" style="margin-top: 10px;">Отправить</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'account_login' %}">Войдите</a>, чтобы оставить комментарий</p>
+    {% endif %}
+    
+    <div class="comments">
+        {% for comment in comments %}
+            <div class="comment" style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                <strong>{{ comment.user.username }}</strong> 
+                <span style="color: #888; font-size: 12px;">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                <p>{{ comment.text }}</p>
+                <span>Рейтинг: {{ comment.rating }}</span>
+            </div>
+        {% empty %}
+            <p>Пока нет комментариев. Будьте первым!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endcache %}
+{% endblock %}

@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 @shared_task
 def send_notification_to_subscribers_async(post_id):
-    """Асинхронная отправка уведомлений подписчикам при создании новости"""
+    """Асинхронно отправляет уведомления подписчикам категорий при создании поста."""
     try:
         post = Post.objects.get(id=post_id)
         categories = post.categories.all()
@@ -69,6 +69,7 @@ def send_notification_to_subscribers_async(post_id):
 
 @shared_task
 def send_weekly_newsletter():
+    """Отправляет еженедельную рассылку новых постов подписчикам категорий."""
     try:
         week_ago = timezone.now() - timedelta(days=7)
 
@@ -125,6 +126,7 @@ def send_weekly_newsletter():
 
 @shared_task
 def send_welcome_email_async(user_id):
+    """Асинхронно отправляет приветственное письмо с подтверждением email новому пользователю."""
     try:
         from django.contrib.auth.models import User
         from allauth.account.utils import send_email_confirmation

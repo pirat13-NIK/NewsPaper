@@ -1,0 +1,70 @@
+[
+{
+  "model": "news.category",
+  "pk": 13,
+  "fields": {
+    "name": "Sport",
+    "subscribers": []
+  }
+},
+{
+  "model": "news.category",
+  "pk": 14,
+  "fields": {
+    "name": "Politics",
+    "subscribers": []
+  }
+},
+{
+  "model": "news.category",
+  "pk": 15,
+  "fields": {
+    "name": "Education",
+    "subscribers": []
+  }
+},
+{
+  "model": "news.category",
+  "pk": 16,
+  "fields": {
+    "name": "Technology",
+    "subscribers": []
+  }
+},
+{
+  "model": "news.post",
+  "pk": 7,
+  "fields": {
+    "author": 1,
+    "post_type": "AR",
+    "created_at": "2026-04-11T22:37:39.066Z",
+    "title": "Sport in our life",
+    "text": "Sport is very important for health. You need to do exercises in the morning. You can run or swim. I love playing football. It is fun and useful. Sport helps to be strong and resilient. Sport also disciplines. I do sports every day and feel great.",
+    "rating": 3
+  }
+},
+{
+  "model": "news.post",
+  "pk": 8,
+  "fields": {
+    "author": 2,
+    "post_type": "AR",
+    "created_at": "2026-04-11T22:37:39.203Z",
+    "title": "Why education is important",
+    "text": "Education gives knowledge. Without knowledge it is difficult to find a job. You need to study well at school. Then you will enter the institute. And then you will find a good job. Education develops the brain. You become smarter and more interesting for other people. You need to learn all your life.",
+    "rating": 1
+  }
+},
+{
+  "model": "news.post",
+  "pk": 9,
+  "fields": {
+    "author": 1,
+    "post_type": "NW",
+    "created_at": "2026-04-11T22:37:39.401Z",
+    "title": "Holidays will be extended",
+    "text": "Students are waiting for good news. Summer holidays will be extended for a week. You can rest longer. Lessons will start only on September 7. This decision was made by the Ministry of Education. Schoolchildren were very happy with this news.",
+    "rating": 5
+  }
+}
+]

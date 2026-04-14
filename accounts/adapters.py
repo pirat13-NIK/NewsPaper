@@ -6,8 +6,10 @@ from django.conf import settings
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
+    """Кастомный адаптер для allauth с персонализированными письмами."""
 
     def send_mail(self, template_prefix, email, context):
+        """Отправляет email, переопределяя приветственное письмо с кастомной темой."""
         user = context.get('user')
 
         if template_prefix == 'account/email/email_confirmation_signup':
