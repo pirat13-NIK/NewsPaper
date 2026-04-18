@@ -39,3 +39,6 @@ celerybeat-schedule-shm
 celerybeat-schedule-wal
 
 echo "django_cache/"
+
+logs/
+*.log

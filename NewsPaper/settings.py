@@ -16,17 +16,23 @@ from celery.schedules import crontab
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Создаем директорию для логов, если её нет
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-jxs%u--n3f8zg6=t5qiv36)px((^a30t&gh!6nlkl$i49p#h#1'
+# Для production используйте переменные окружения
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-jxs%u--n3f8zg6=t5qiv36)px((^a30t&gh!6nlkl$i49p#h#1')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Для production укажите свои домены
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',') if os.environ.get('ALLOWED_HOSTS') else []
 
 
 # Application definition
@@ -56,10 +62,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'news.middleware.DeviceTemplateMiddleware'
 ]
 
 ROOT_URLCONF = 'NewsPaper.urls'
-
 
 TEMPLATES = [
     {
@@ -126,23 +132,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
 
 SITE_ID = 1
 
+# Настройки аутентификации (только один блок)
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/news/'
 LOGOUT_REDIRECT_URL = '/'
 
+# Настройки email верификации (только один блок)
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'optional'
-
-# Настройки email верификации
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/accounts/login/'
@@ -209,7 +211,7 @@ CELERY_BEAT_SCHEDULE = {
 # Cache settings with better performance
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'BACKEND': 'django_redis.cache.RedisCache',
         'LOCATION': 'redis://127.0.0.1:6379/1',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
@@ -220,7 +222,6 @@ CACHES = {
                 'timeout': 20,
             },
             'MAX_CONNECTIONS': 1000,
-            'PICKLE_VERSION': -1,
         },
         'KEY_PREFIX': 'newspaper',
         'TIMEOUT': 3600,
@@ -233,4 +234,144 @@ CACHE_TIMEOUTS = {
     'comment': 1800,   # 30 минут для комментариев
     'list': 300,       # 5 минут для списков
     'nav': 600,        # 10 минут для навигации
+}
+
+# Настройки логирования
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    # Форматтеры (форматы вывода сообщений)
+    'formatters': {
+        # Формат для консоли (DEBUG и выше)
+        'console': {
+            'format': '{asctime} - {levelname} - {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+        # Формат для консоли с pathname (для WARNING и выше)
+        'console_warning': {
+            'format': '{asctime} - {levelname} - {message} - {pathname}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+        # Формат для general.log (INFO и выше)
+        'general': {
+            'format': '{asctime} - {levelname} - {module} - {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+        # Формат для errors.log (ERROR и CRITICAL)
+        'errors': {
+            'format': '{asctime} - {levelname} - {message} - {pathname} - {exc_info}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+        # Формат для security.log
+        'security': {
+            'format': '{asctime} - {levelname} - {module} - {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+        # Формат для email (без стэка)
+        'email': {
+            'format': '{asctime} - {levelname} - {message} - {pathname}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
+
+    # Фильтры
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+
+    # Обработчики (куда отправляем логи)
+    'handlers': {
+        # Консольный вывод
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'filters': ['require_debug_true'],
+            'formatter': 'console',
+        },
+        'console_warning': {
+            'level': 'WARNING',
+            'class': 'logging.StreamHandler',
+            'filters': ['require_debug_true'],
+            'formatter': 'console_warning',
+        },
+        # Файл general.log
+        'general_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'general.log'),
+            'filters': ['require_debug_false'],
+            'formatter': 'general',
+        },
+        # Файл errors.log
+        'errors_file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'errors.log'),
+            'formatter': 'errors',
+        },
+        # Файл security.log
+        'security_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'security.log'),
+            'formatter': 'security',
+        },
+        # Отправка на почту
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['require_debug_false'],
+            'formatter': 'email',
+            'include_html': False,
+        },
+    },
+
+    # Логгеры (источники сообщений)
+    'loggers': {
+        # Основной логгер django
+        'django': {
+            'handlers': ['console', 'console_warning', 'general_file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        # Логгеры для errors.log
+        'django.request': {
+            'handlers': ['errors_file', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['errors_file', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.template': {
+            'handlers': ['errors_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['errors_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        # Логгер для security.log
+        'django.security': {
+            'handlers': ['security_file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
 }
